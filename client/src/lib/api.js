@@ -14,7 +14,7 @@ async function request(path, options = {}) {
     });
   } catch {
     throw new Error(
-      `Could not reach the API at ${API_BASE_URL}. Make sure the server is running.`
+      `Could not reach the service at ${API_BASE_URL}. Make sure the backend is running.`
     );
   }
 
@@ -41,8 +41,4 @@ export function downloadPostMedia(url) {
     method: "POST",
     body: JSON.stringify({ url })
   });
-}
-
-export function resolveDownloadUrl(publicPath) {
-  return `${API_BASE_URL}${publicPath}`;
 }

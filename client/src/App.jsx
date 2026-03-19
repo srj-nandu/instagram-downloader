@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { downloadPostMedia, resolveDownloadUrl } from "./lib/api.js";
+import { downloadPostMedia } from "./lib/api.js";
 
 function SocialIcon({ kind }) {
   if (kind === "instagram") {
@@ -37,7 +37,7 @@ function ResultPanel({ result }) {
   if (!result) {
     return (
       <div className="result-empty">
-        Run a download request to save Instagram post files here.
+        Run a download request to get direct media links here.
       </div>
     );
   }
@@ -46,25 +46,24 @@ function ResultPanel({ result }) {
     <section className="result-panel">
       <div className="result-header">
         <div>
-          <p className="eyebrow">Saved Output</p>
+          <p className="eyebrow">Media Links</p>
           <h3>{result.message}</h3>
         </div>
-        <p className="result-folder">{result.folder}</p>
+        <p className="result-folder">{result.source}</p>
       </div>
 
       <div className="file-grid">
         {result.files.map((file) => (
-          <article className="file-card" key={file.publicPath}>
+          <article className="file-card" key={file.directUrl}>
             <p className="file-type">{file.mediaType}</p>
             <h4>{file.name}</h4>
-            <p>{(file.sizeBytes / 1024 / 1024).toFixed(2)} MB</p>
             <a
               className="file-link"
-              href={resolveDownloadUrl(file.publicPath)}
+              href={file.directUrl}
               target="_blank"
               rel="noreferrer"
             >
-              Open file
+              Open media
             </a>
           </article>
         ))}
@@ -99,16 +98,16 @@ export default function App() {
       <section className="hero">
         <div className="hero-copy">
           <p className="eyebrow">Instagram Downloader</p>
-          <h1>Download post images and videos from one panel.</h1>
+          <h1>Get post images and videos from one panel.</h1>
           <p className="intro">
-            Paste a public Instagram post, reel, or TV URL and save the media
-            files directly to your downloads folder.
+            Paste a public Instagram post, reel, or TV URL and get direct media
+            links without saving files on the server.
           </p>
         </div>
 
         <aside className="hero-note">
           <p className="note-label">Downloader</p>
-          <p>Ready locally</p>
+          <p>Ready for deployment</p>
           <p className="note-label">Supported</p>
           <p>Posts, reels, TV posts</p>
           <p className="note-label">Creator</p>
@@ -165,12 +164,12 @@ export default function App() {
             />
 
             <button type="submit" disabled={loadingPost}>
-              {loadingPost ? "Downloading..." : "Download Post"}
+              {loadingPost ? "Fetching..." : "Get Media Links"}
             </button>
           </form>
 
           <p className="helper-text">
-            Story download support has been removed from this project.
+            This version is easier to deploy because it does not store downloaded files on the server.
           </p>
 
           {postError ? <p className="error-text">{postError}</p> : null}

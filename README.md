@@ -5,12 +5,10 @@ This repository is split into two services:
 - `client/` - React frontend powered by Vite
 - `server/` - Node.js API powered by Express
 
-Downloads are written to the shared `downloads/` folder and served by the Node API at `/downloads/...`.
-
 ## What the MVP supports
 
 - Public Instagram post URLs for image and video download
-- Shared download links returned to the frontend
+- Direct media links returned to the frontend
 
 ## Environment
 
@@ -58,6 +56,10 @@ cd server
 npm install
 npm run dev
 ```
+
+Deploy note:
+
+- A root `render.yaml` is included for Git-based Render backend deployment.
 
 ### Client
 
