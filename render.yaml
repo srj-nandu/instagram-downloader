@@ -1,9 +1,47 @@
 services:
   - type: web
+    name: instagram-downloader-client
+    runtime: static
+    rootDir: client
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: instagram-downloader-backend
+          envVarKey: RENDER_EXTERNAL_URL
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
     name: instagram-downloader-backend
     runtime: node
     rootDir: server
-    buildCommand: npm install
+    buildCommand: npm ci
     startCommand: npm start
     healthCheckPath: /health
     autoDeploy: true
+
+  - type: web
+    name: instagram-story-service
+    runtime: python
+    rootDir: story-service
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app.main:app --config gunicorn.conf.py
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: INSTAGRAM_SESSION_FILE
+        value: .session
+      - key: DOWNLOADS_DIR
+        value: downloads
+      - key: PUBLIC_DOWNLOAD_PREFIX
+        value: /downloads
+      - key: STORY_COOLDOWN_MINUTES
+        value: 30
+      - key: SESSION_STATUS_TTL_SECONDS
+        value: 60

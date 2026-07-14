@@ -1,4 +1,5 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
 from app.downloader import (
@@ -71,3 +72,10 @@ def download_my_story_media() -> dict:
         raise HTTPException(status_code=429, detail=str(exc)) from exc
     except DownloadError as exc:
         raise HTTPException(status_code=502, detail=str(exc)) from exc
+
+
+app.mount(
+    settings.public_download_prefix,
+    StaticFiles(directory=settings.downloads_dir),
+    name="downloads",
+)

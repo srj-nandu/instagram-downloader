@@ -4,6 +4,7 @@ This repository is split into two services:
 
 - `client/` - React frontend powered by Vite
 - `server/` - Node.js API powered by Express
+- `story-service/` - optional FastAPI service for authenticated story downloads
 
 ## What the MVP supports
 
@@ -59,7 +60,14 @@ npm run dev
 
 Deploy note:
 
-- A root `render.yaml` is included for Git-based Render backend deployment.
+- A root `render.yaml` is included for Git-based Render deployment of the
+  Vite static site, Express API, and optional FastAPI story service.
+- The FastAPI service runs behind Gunicorn with Uvicorn workers via
+  `story-service/gunicorn.conf.py`.
+- To enable story downloads, add `INSTAGRAM_USERNAME` and `INSTAGRAM_PASSWORD`
+  to the `instagram-story-service` environment in Render.
+- For persistent story sessions across deploys, attach a Render disk and point
+  `INSTAGRAM_SESSION_FILE` and `DOWNLOADS_DIR` at that disk mount path.
 
 ### Client
 
