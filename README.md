@@ -64,6 +64,9 @@ Deploy note:
   Vite static site, Express API, and optional FastAPI story service.
 - The FastAPI service runs behind Gunicorn with Uvicorn workers via
   `story-service/gunicorn.conf.py`.
+- If you create a single Python web service manually from the repository root,
+  use `pip install -r requirements.txt` and
+  `gunicorn app.main:app --config gunicorn.conf.py`.
 - To enable story downloads, add `INSTAGRAM_USERNAME` and `INSTAGRAM_PASSWORD`
   to the `instagram-story-service` environment in Render.
 - For persistent story sessions across deploys, attach a Render disk and point
