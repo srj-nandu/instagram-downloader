@@ -4,3 +4,4 @@ instaloader==4.14.2
 pydantic>=2.10,<3
 python-dotenv==1.0.1
 uvicorn==0.32.0
+yt-dlp==2026.7.4

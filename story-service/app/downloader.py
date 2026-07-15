@@ -6,6 +6,7 @@ from pathlib import Path
 from uuid import uuid4
 
 import instaloader
+from yt_dlp import YoutubeDL
 
 from app.config import Settings
 
@@ -121,14 +122,33 @@ class InstagramDownloader:
         shortcode = self._extract_shortcode(url)
         target = self._make_target("post", shortcode)
         loader = self._create_loader()
+        instaloader_error: Exception | None = None
 
         try:
+            if self.story_login_configured:
+                self._authenticate(loader)
             post = instaloader.Post.from_shortcode(loader.context, shortcode)
             loader.download_post(post, target=target)
         except Exception as exc:
-            self._raise_download_error(exc, "download post media")
+            instaloader_error = exc
+            try:
+                self._download_post_with_ytdlp(url, target)
+            except DownloadError as fallback_exc:
+                raise DownloadError(
+                    "Unable to download post media with Instaloader or yt-dlp: "
+                    f"{instaloader_error}; {fallback_exc}"
+                ) from fallback_exc
 
-        files = self._collect_media_files(target)
+        try:
+            files = self._collect_media_files(target)
+        except DownloadError as exc:
+            if instaloader_error:
+                raise DownloadError(
+                    "Unable to download post media with Instaloader or yt-dlp: "
+                    f"{instaloader_error}; {exc}"
+                ) from exc
+            raise
+
         return {
             "kind": "post",
             "folder": target,
@@ -237,6 +257,27 @@ class InstagramDownloader:
             raise
         except Exception as exc:
             self._raise_download_error(exc, "authenticate the Instagram session")
+
+    def _download_post_with_ytdlp(self, url: str, target: str) -> None:
+        target_dir = self.settings.downloads_dir / target
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        options = {
+            "outtmpl": str(target_dir / "%(title).80s-%(id)s.%(ext)s"),
+            "quiet": True,
+            "no_warnings": True,
+            "noplaylist": True,
+        }
+
+        if self.settings.instagram_username and self.settings.instagram_password:
+            options["username"] = self.settings.instagram_username
+            options["password"] = self.settings.instagram_password
+
+        try:
+            with YoutubeDL(options) as ydl:
+                ydl.download([url])
+        except Exception as exc:
+            self._raise_download_error(exc, "download post media")
 
     def _extract_shortcode(self, url: str) -> str:
         match = SHORTCODE_PATTERN.search(url.strip())
