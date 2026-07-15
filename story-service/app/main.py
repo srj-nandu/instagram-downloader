@@ -17,6 +17,22 @@ app = FastAPI(title="Story Service")
 downloader = InstagramDownloader(settings)
 
 
+@app.get("/")
+def root() -> dict[str, object]:
+    return {
+        "service": "story-service",
+        "status": "ok",
+        "endpoints": {
+            "health": "/health",
+            "docs": "/docs",
+            "capabilities": "/capabilities",
+            "session": "/session",
+            "downloadPost": "/downloads/post",
+            "downloadStories": "/downloads/stories",
+        },
+    }
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"service": "story-service", "status": "ok"}
