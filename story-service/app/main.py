@@ -1,4 +1,7 @@
+from pathlib import Path
+
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.config import settings
@@ -15,10 +18,16 @@ from app.models import DownloadPostRequest, DownloadStoriesRequest
 
 app = FastAPI(title="Story Service")
 downloader = InstagramDownloader(settings)
+ui_path = Path(__file__).resolve().parent / "static" / "index.html"
 
 
 @app.get("/")
-def root() -> dict[str, object]:
+def root() -> FileResponse:
+    return FileResponse(ui_path)
+
+
+@app.get("/api")
+def api_root() -> dict[str, object]:
     return {
         "service": "story-service",
         "status": "ok",
